@@ -93,7 +93,9 @@ class _AudioRecorderState extends State<AudioRecorder> {
                             recorderController: widget.recorderController,
                             size: Size(_waveformWidth, 40),
                             waveStyle: WaveStyle(
+                              scaleFactor: 100,
                               showMiddleLine: false,
+                              waveCap: StrokeCap.square,
                               waveColor: context.theme.colorScheme.onPrimary,
                               extendWaveform: true,
                             ),

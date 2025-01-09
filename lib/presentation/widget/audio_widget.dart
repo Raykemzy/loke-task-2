@@ -1,9 +1,12 @@
 import 'dart:io';
 
 import 'package:audio_waveforms/audio_waveforms.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:loke_task_2/core/context_extensions.dart';
+import 'package:loke_task_2/core/theme.dart';
 import 'package:loke_task_2/domain/enums.dart';
 import 'package:loke_task_2/domain/models/local_audio_model.dart';
 import 'package:loke_task_2/presentation/notifiers/save_audio_notifier.dart';
@@ -23,9 +26,13 @@ class _AudioWidgetState extends ConsumerState<AudioWidget>
   final RecorderController _recorderController = RecorderController();
   final PlayerController _playerController = PlayerController();
 
+  /// Listenable for audio file path status
   final ValueNotifier<String> _recordedFilePath = ValueNotifier<String>('');
-  final ValueNotifier<List<double>> _waveFormData =
-      ValueNotifier<List<double>>([]);
+
+  /// Listenable for audio wave form data status
+  final ValueNotifier<List<double>> _waveFormData = ValueNotifier<List<double>>(
+    [],
+  );
 
   /// Listenable for audio recording status
   final ValueNotifier<AudioRecorderState> _audioRecordingState =
@@ -33,6 +40,9 @@ class _AudioWidgetState extends ConsumerState<AudioWidget>
 
   /// Listenable for audio duration
   final ValueNotifier<int> _audioDuration = ValueNotifier(0);
+
+  /// Listenable for current playing duration
+  final ValueNotifier<int> _currentPlayingDuration = ValueNotifier(0);
 
   @override
   void initState() {
@@ -53,22 +63,33 @@ class _AudioWidgetState extends ConsumerState<AudioWidget>
     super.dispose();
   }
 
-  Future<void> _initializeAudioPlayer() async {
-    final audioObject = ref.watch(saveAudioNotifierProvider);
-    if (audioObject?.filePath == null || audioObject?.filePath == '') {
-      print("No valid audio file path found.");
+  Future<void> _initializeAudioPlayer({LocalAudioModel? savedObject}) async {
+    LocalAudioModel? audioObjectToUse;
+    if (savedObject == null) {
+      audioObjectToUse = ref.watch(saveAudioNotifierProvider);
+    } else {
+      audioObjectToUse = savedObject;
+    }
+
+    if (audioObjectToUse?.filePath == null ||
+        audioObjectToUse?.filePath == '') {
+      if (kDebugMode) {
+        print("No valid audio file path found.");
+      }
       return;
     }
 
-    final file = File(audioObject!.filePath);
+    final file = File(audioObjectToUse!.filePath);
     if (!file.existsSync()) {
-      print("Audio file not found at path: ${audioObject.filePath}");
+      if (kDebugMode) {
+        print("Audio file not found at path: ${audioObjectToUse.filePath}");
+      }
       return;
     }
 
     ///Get file path from local storage
     await _playerController.preparePlayer(
-      path: audioObject.filePath,
+      path: audioObjectToUse.filePath,
       shouldExtractWaveform: true,
     );
     _playerController.addListener(setUpAudioPlayerListener);
@@ -76,20 +97,20 @@ class _AudioWidgetState extends ConsumerState<AudioWidget>
       _audioDuration.value = value;
     });
     _waveFormData.value = _playerController.waveformData;
-
-    //_saveWaveFormData();
+    if (kDebugMode) {
+      print(_waveFormData.value);
+    }
   }
 
-  // void _saveWaveFormData() {
-  //   final waveformData = _playerController.waveformData;
-  //   final audioObject = ref.watch(saveAudioNotifierProvider);
-  //   final updatedObject = audioObject.copyWith(waveformData: waveformData);
-  //   ref.read(saveAudioNotifierProvider.notifier).saveAudioObject(updatedObject);
-  // }
-
   void recorderListener() {
-    _recorderController.onRecordingEnded.listen((duration) {
-      _waveFormData.value = _recorderController.waveData;
+    _recorderController.onCurrentDuration.listen((duration) {
+      _audioDuration.value = duration.inMilliseconds;
+      if (kDebugMode) {
+        print('durationnnn -> ${_audioDuration.value}');
+      }
+    });
+    _playerController.onCurrentDurationChanged.listen((duration) {
+      _currentPlayingDuration.value = duration;
     });
   }
 
@@ -103,9 +124,9 @@ class _AudioWidgetState extends ConsumerState<AudioWidget>
           _audioRecordingState.value = AudioRecorderState.paused;
           break;
         case PlayerState.stopped:
-          break;
+          _audioRecordingState.value = AudioRecorderState.playingStopped;
         default:
-          _audioRecordingState.value = AudioRecorderState.idle;
+          _audioRecordingState.value = _audioRecordingState.value;
           break;
       }
     });
@@ -117,23 +138,50 @@ class _AudioWidgetState extends ConsumerState<AudioWidget>
       valueListenable: _audioRecordingState,
       builder: (context, status, _) => Column(
         children: [
-          switch (status) {
-            AudioRecorderState.idle ||
-            AudioRecorderState.recording =>
-              AudioRecorder(
-                recorderController: _recorderController,
-                audioRecordingState: _audioRecordingState,
-              ),
-            _ => AudioPlayer(
-                playerController: _playerController,
-                audioRecordingState: _audioRecordingState,
-                waveformData: _waveFormData.value,
-              )
-          },
+          ValueListenableBuilder(
+              valueListenable: _audioDuration,
+              builder: (context, duration, _) {
+                return ValueListenableBuilder(
+                    valueListenable: _currentPlayingDuration,
+                    builder: (context, currentElapsedDuration, _) {
+                      return Center(
+                        child: Text(
+                          status == AudioRecorderState.recordingStopped ||
+                                  status == AudioRecorderState.playing ||
+                                  status == AudioRecorderState.paused
+                              ? '${getDurationText(currentElapsedDuration)} / ${getDurationText(duration)}'
+                              : getDurationText(duration),
+                          style:
+                              context.theme.textTheme.displayMedium?.copyWith(
+                            color: getColor(),
+                          ),
+                        ),
+                      );
+                    });
+              }),
+          20.verticalSpace,
+          SizedBox(
+            height: 40,
+            child: switch (status) {
+              AudioRecorderState.idle ||
+              AudioRecorderState.recording ||
+              AudioRecorderState.playingStopped =>
+                AudioRecorder(
+                  recorderController: _recorderController,
+                  audioRecordingState: _audioRecordingState,
+                ),
+              _ => AudioPlayer(
+                  playerController: _playerController,
+                  audioRecordingState: _audioRecordingState,
+                  waveformData: _waveFormData.value,
+                )
+            },
+          ),
           20.verticalSpace,
           AudioControls(
             recordState: _audioRecordingState,
             onTap: _handleRecordingAndPlayBack,
+            onDeleted: onRecordingDeleted,
           ),
         ],
       ),
@@ -143,6 +191,7 @@ class _AudioWidgetState extends ConsumerState<AudioWidget>
   void _handleRecordingAndPlayBack() {
     switch (_audioRecordingState.value) {
       case AudioRecorderState.idle:
+      case AudioRecorderState.playingStopped:
         _startRecording();
         break;
       case AudioRecorderState.recording:
@@ -171,7 +220,6 @@ class _AudioWidgetState extends ConsumerState<AudioWidget>
 
     _recordedFilePath.value = await _recorderController.stop() ?? '';
     _audioRecordingState.value = AudioRecorderState.recordingStopped;
-    _audioDuration.value = _recorderController.elapsedDuration.inSeconds;
 
     final audioObject = LocalAudioModel(
       filePath: _recordedFilePath.value,
@@ -180,13 +228,17 @@ class _AudioWidgetState extends ConsumerState<AudioWidget>
     );
 
     // Save audio data and reinitialize the player
-    notifier.saveAudioObject(audioObject);
-    await _initializeAudioPlayer();
+    notifier.saveAudioObject(
+      audioObject,
+      onSaved: (audioObject) async => await _initializeAudioPlayer(
+        savedObject: audioObject,
+      ),
+    );
   }
 
   void _playRecording() async {
     await _playerController.startPlayer();
-    await _playerController.setFinishMode(finishMode: FinishMode.pause);
+    await _playerController.setFinishMode(finishMode: FinishMode.stop);
     _audioRecordingState.value = AudioRecorderState.playing;
   }
 
@@ -196,7 +248,7 @@ class _AudioWidgetState extends ConsumerState<AudioWidget>
   }
 
   String getDurationText(int totalMilliseconds) {
-    if (totalMilliseconds < 0) {
+    if (totalMilliseconds <= 0) {
       return '00:00';
     }
 
@@ -206,5 +258,20 @@ class _AudioWidgetState extends ConsumerState<AudioWidget>
 
     return '${minutes.toString().padLeft(2, '0')}'
         ':${seconds.toString().padLeft(2, '0')}';
+  }
+
+  Color getColor() {
+    return _audioRecordingState.value == AudioRecorderState.idle
+        ? AppTheme.disabledColor
+        : _audioRecordingState.value == AudioRecorderState.recording
+            ? context.theme.primaryColor
+            : Colors.white;
+  }
+
+  void onRecordingDeleted() async {
+    _audioRecordingState.value = AudioRecorderState.idle;
+    _waveFormData.value = [];
+    _audioDuration.value = 0;
+    await _playerController.stopPlayer();
   }
 }

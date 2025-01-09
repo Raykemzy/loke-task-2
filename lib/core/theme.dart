@@ -13,6 +13,7 @@ class AppTheme {
   static const Color _waveformColor = Color(0xFF36393E);
   static const Color activeIndicatorColor = Color(0xFFD2D2D2);
   static const Color inActiveIndicatorColor = Color(0xFF878787);
+  static const Color disabledColor = Color(0xFF5D6369);
   static const Color _defaultRegularTextColor = Color(0xFFC4C4C4);
 
   // 🅰️ Font Sizes
@@ -21,6 +22,7 @@ class AppTheme {
   static final double _titleSmallFontSize = 11.sp;
   static final double _bodyLargeFontSize = 14.sp;
   static final double _bodyMediumFontSize = 12.sp;
+  static final double _displayMediumFontSize = 13.sp;
 
   // 🅱️ Default Font Family
   static const String _defaultFontFamily = FontFamily.proximaNova;
@@ -57,8 +59,8 @@ class AppTheme {
       ),
       displayMedium: TextStyle(
         fontFamily: _defaultFontFamily,
-        fontSize: _bodyMediumFontSize,
-        fontWeight: FontWeight.w600,
+        fontSize: _displayMediumFontSize,
+        fontWeight: FontWeight.w500,
       ),
       bodyLarge: TextStyle(
         fontFamily: _defaultFontFamily,

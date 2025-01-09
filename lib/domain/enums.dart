@@ -1,1 +1,1 @@
-enum AudioRecorderState { idle, recording, recordingStopped, paused, playing }
+enum AudioRecorderState { idle, recording, recordingStopped, paused, playing, playingStopped }
