@@ -17,4 +17,18 @@ class LocalAudioModel {
     required this.waveformData,
     required this.duration,
   });
+
+  factory LocalAudioModel.emptyState() =>
+      LocalAudioModel(filePath: '', waveformData: [], duration: 0);
+
+  LocalAudioModel copyWith({
+    String? filePath,
+    List<double>? waveformData,
+    int? duration,
+  }) =>
+      LocalAudioModel(
+        filePath: filePath ?? this.filePath,
+        waveformData: waveformData ?? this.waveformData,
+        duration: duration ?? this.duration,
+      );
 }

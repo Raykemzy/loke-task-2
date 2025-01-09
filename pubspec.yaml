@@ -16,6 +16,10 @@ dependencies:
   hive_flutter: ^1.1.0
   flutter_screenutil: ^5.9.3
   flutter_svg: ^2.0.16
+  riverpod: ^2.6.1
+  riverpod_annotation: ^2.6.1
+  flutter_riverpod: ^2.6.1
+  path_provider: ^2.1.5
 
 dev_dependencies:
   flutter_gen_runner:
@@ -25,6 +29,7 @@ dev_dependencies:
   flutter_lints: ^4.0.0
   build_runner: ^2.4.13
   hive_generator: ^2.0.1
+  riverpod_generator: ^2.6.3
 
 flutter:
   uses-material-design: true

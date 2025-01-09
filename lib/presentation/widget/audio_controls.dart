@@ -91,9 +91,7 @@ class _RecordButton extends StatelessWidget {
                       ),
                     AudioRecorderState.recordingStopped ||
                     AudioRecorderState.paused =>
-                      AppSvgWidget(
-                        path: Assets.svgs.playButton,
-                      ),
+                      AppSvgWidget(path: Assets.svgs.playButton),
                     AudioRecorderState.playing => AppSvgWidget(
                         path: Assets.svgs.pauseButton,
                       ),

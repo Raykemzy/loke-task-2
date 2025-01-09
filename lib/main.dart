@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:loke_task_2/core/services/storage_keys.dart';
 import 'package:loke_task_2/core/theme.dart';
+import 'package:loke_task_2/domain/models/local_audio_model.dart';
 import 'package:loke_task_2/presentation/recording_view.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Hive.initFlutter();
+  Hive.registerAdapter(LocalAudioModelAdapter());
   await Hive.openBox(StorageKeys.appBox);
 
-  runApp(const MyApp());
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {

@@ -76,7 +76,7 @@ class _AudioRecorderState extends State<AudioRecorder> {
           children: [
             if (_flatLineWidth > 0)
               AnimatedContainer(
-                duration: const Duration(milliseconds: 10000),
+                duration: const Duration(milliseconds: 800),
                 curve: Curves.easeInOut,
                 width: _flatLineWidth,
                 height: 2,
