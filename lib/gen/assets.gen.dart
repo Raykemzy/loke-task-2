@@ -30,11 +30,21 @@ class $AssetsSvgsGen {
   /// File path: assets/svgs/chevron-left.svg
   String get chevronLeft => 'assets/svgs/chevron-left.svg';
 
+  /// File path: assets/svgs/pause_button.svg
+  String get pauseButton => 'assets/svgs/pause_button.svg';
+
+  /// File path: assets/svgs/play_button.svg
+  String get playButton => 'assets/svgs/play_button.svg';
+
+  /// File path: assets/svgs/stop_button.svg
+  String get stopButton => 'assets/svgs/stop_button.svg';
+
   /// File path: assets/svgs/three-dot.svg
   String get threeDot => 'assets/svgs/three-dot.svg';
 
   /// List of all assets
-  List<String> get values => [chevronLeft, threeDot];
+  List<String> get values =>
+      [chevronLeft, pauseButton, playButton, stopButton, threeDot];
 }
 
 class Assets {

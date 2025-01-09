@@ -40,12 +40,12 @@ class CustomScaffold extends StatelessWidget {
               Align(
                 alignment: Alignment.bottomCenter,
                 child: Container(
-                  height: context.height / 2,
+                  height: context.height / 1.5,
                   decoration: const BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
-                      stops: [0.1, 0.4],
+                      stops: [0.1, 0.45],
                       colors: [Colors.transparent, Colors.black],
                     ),
                   ),

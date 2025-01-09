@@ -13,7 +13,7 @@ class BioSection extends StatelessWidget {
       child: Column(
         children: [
           const _PictureAndNameTag(),
-          20.verticalSpace,
+          30.verticalSpace,
           SizedBox(
             width: context.width / 1.5,
             child: Text(
@@ -22,7 +22,7 @@ class BioSection extends StatelessWidget {
               style: context.theme.textTheme.titleMedium?.copyWith(height: 1),
             ),
           ),
-          20.verticalSpace,
+          30.verticalSpace,
           Center(
             child: Text(
               '"Mine is definitely the peace in the morning."',
@@ -31,6 +31,7 @@ class BioSection extends StatelessWidget {
                   fontStyle: FontStyle.italic),
             ),
           ),
+          20.verticalSpace,
         ],
       ),
     );
