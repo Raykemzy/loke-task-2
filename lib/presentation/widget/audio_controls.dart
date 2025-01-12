@@ -18,7 +18,6 @@ class AudioControls extends ConsumerWidget {
     required this.recordState,
     this.onDeleted,
   });
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final notifier = ref.read(saveAudioNotifierProvider.notifier);
@@ -33,7 +32,13 @@ class AudioControls extends ConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     InkWell(
-                      onTap: () => notifier.deleteAudio(onDeleted: onDeleted),
+                      onTap: () {
+                        if (audioState == AudioRecorderState.recording ||
+                            audioState == AudioRecorderState.idle) {
+                          return;
+                        }
+                        notifier.deleteAudio(onDeleted: onDeleted);
+                      },
                       child: Text(
                         'Delete',
                         style: context.theme.textTheme.displayMedium?.copyWith(
@@ -70,7 +75,8 @@ class AudioControls extends ConsumerWidget {
 
   Color _getColor(AudioRecorderState audioState) {
     return audioState == AudioRecorderState.idle ||
-            audioState == AudioRecorderState.recording
+            audioState == AudioRecorderState.recording ||
+            audioState == AudioRecorderState.playingStopped
         ? AppTheme.disabledColor
         : Colors.white;
   }
