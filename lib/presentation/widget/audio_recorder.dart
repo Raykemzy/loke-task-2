@@ -19,12 +19,12 @@ class AudioRecorder extends StatefulWidget {
   State<AudioRecorder> createState() => _AudioRecorderState();
 }
 
-class _AudioRecorderState extends State<AudioRecorder> {
+class _AudioRecorderState extends State<AudioRecorder>
+    with SingleTickerProviderStateMixin {
+  late ValueNotifier<double> _waveformWidthNotifier;
+  late AnimationController _animationController;
   // Timer to periodically update the elapsed time
   Timer? _timer;
-
-  //Elapsed time of recording
-  late int _elapsedTimeInSeconds;
 
   //Rate at width waveForm reduces in pixels per second
   final int growthRate = 50;
@@ -34,79 +34,80 @@ class _AudioRecorderState extends State<AudioRecorder> {
   @override
   void initState() {
     super.initState();
-    _elapsedTimeInSeconds = widget.recorderController.elapsedDuration.inSeconds;
+    _waveformWidthNotifier = ValueNotifier(0.0);
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    )..addListener(() {
+        final elapsedDuration = widget.recorderController.elapsedDuration;
+        final calculatedWidth = elapsedDuration.inSeconds * growthRate;
+        final screenWidth = context.width - _horizontalPadding;
 
-    _timer = Timer.periodic(const Duration(milliseconds: 1000), (timer) {
-      setState(() {
-        // Fetch the current elapsed duration from the recorder controller
-        _elapsedTimeInSeconds =
-            widget.recorderController.elapsedDuration.inSeconds;
+        _waveformWidthNotifier.value = calculatedWidth > screenWidth
+            ? screenWidth
+            : calculatedWidth.toDouble();
       });
-    });
+
+    _animationController.repeat();
   }
 
   @override
   void dispose() {
+    _animationController.dispose();
     _timer?.cancel();
     super.dispose();
-  }
-
-  //Waveform width
-  double get _waveformWidth {
-    final calculatedWidth = _elapsedTimeInSeconds * growthRate;
-    final screenWidth = context.width - _horizontalPadding;
-    return calculatedWidth > screenWidth
-        ? screenWidth
-        : calculatedWidth.toDouble();
-  }
-
-  double get _flatLineWidth {
-    final screenWidth = context.width - _horizontalPadding;
-    return screenWidth - _waveformWidth;
   }
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: _horizontalPadding),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        physics: const NeverScrollableScrollPhysics(),
-        child: Row(
-          children: [
-            if (_flatLineWidth > 0)
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 800),
-                curve: Curves.easeInOut,
-                width: _flatLineWidth,
-                height: 2,
-                color: context.theme.colorScheme.onPrimary,
-              ),
-            if (widget.recorderController.isRecording)
-              ValueListenableBuilder(
-                valueListenable: widget.audioRecordingState,
-                builder: (context, state, _) {
-                  return state == AudioRecorderState.recording
-                      ? Padding(
-                          padding: EdgeInsets.only(left: 5.w),
-                          child: AudioWaveforms(
-                            recorderController: widget.recorderController,
-                            size: Size(_waveformWidth, 40),
-                            waveStyle: WaveStyle(
-                              scaleFactor: 100,
-                              showMiddleLine: false,
-                              waveCap: StrokeCap.square,
-                              waveColor: context.theme.colorScheme.onPrimary,
-                              extendWaveform: true,
-                              spacing: 6.0,
-                            ),
-                          ),
-                        )
-                      : const SizedBox.shrink();
-                },
-              ),
-          ],
-        ),
+      child: ValueListenableBuilder<double>(
+        valueListenable: _waveformWidthNotifier,
+        builder: (context, waveformWidth, _) {
+          final screenWidth = context.width - _horizontalPadding;
+          final flatLineWidth = screenWidth - waveformWidth;
+          return SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            physics: const NeverScrollableScrollPhysics(),
+            child: Row(
+              children: [
+                if (flatLineWidth > 0)
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 800),
+                    curve: Curves.easeInOut,
+                    width: flatLineWidth,
+                    height: 2,
+                    color: context.theme.colorScheme.onPrimary,
+                  ),
+                if (widget.recorderController.isRecording)
+                  ValueListenableBuilder(
+                    valueListenable: widget.audioRecordingState,
+                    builder: (context, state, _) {
+                      return state == AudioRecorderState.recording
+                          ? Padding(
+                              padding: EdgeInsets.only(left: 5.w),
+                              child: AudioWaveforms(
+                                recorderController: widget.recorderController,
+                                size: Size(waveformWidth, 40),
+                                waveStyle: WaveStyle(
+                                  scaleFactor: 100,
+                                  showMiddleLine: false,
+                                  waveCap: StrokeCap.square,
+                                  waveColor:
+                                      context.theme.colorScheme.onPrimary,
+                                  extendWaveform: true,
+                                  spacing: 6.0,
+                                ),
+                              ),
+                            )
+                          : const SizedBox.shrink();
+                    },
+                  ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
