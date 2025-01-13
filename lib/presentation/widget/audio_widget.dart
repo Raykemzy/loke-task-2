@@ -94,7 +94,7 @@ class _AudioWidgetState extends ConsumerState<AudioWidget>
     );
     _playerController.addListener(setUpAudioPlayerListener);
     _playerController.getDuration().then((value) {
-      _audioDuration.value = value;
+      _audioDuration.value = savedObject == null ? 0 : value;
     });
     _waveFormData.value = _playerController.waveformData;
     if (kDebugMode) {
@@ -115,6 +115,9 @@ class _AudioWidgetState extends ConsumerState<AudioWidget>
   }
 
   void setUpAudioPlayerListener() {
+    _playerController.onCurrentExtractedWaveformData.listen((waveFormData) {
+      _waveFormData.value = waveFormData;
+    });
     _playerController.onPlayerStateChanged.listen((state) {
       switch (state) {
         case PlayerState.playing:
@@ -230,8 +233,8 @@ class _AudioWidgetState extends ConsumerState<AudioWidget>
     // Save audio data and reinitialize the player
     notifier.saveAudioObject(
       audioObject,
-      onSaved: (audioObject) async => await _initializeAudioPlayer(
-        savedObject: audioObject,
+      onSaved: (savedAudioObject) async => await _initializeAudioPlayer(
+        savedObject: savedAudioObject,
       ),
     );
   }
@@ -261,10 +264,11 @@ class _AudioWidgetState extends ConsumerState<AudioWidget>
   }
 
   Color getColor() {
-    return _audioRecordingState.value == AudioRecorderState.idle
+    return _audioRecordingState.value == AudioRecorderState.idle ||
+            _audioRecordingState.value == AudioRecorderState.playingStopped
         ? AppTheme.disabledColor
         : _audioRecordingState.value == AudioRecorderState.recording
-            ? context.theme.primaryColor
+            ? context.theme.colorScheme.onSecondary
             : Colors.white;
   }
 

@@ -13,16 +13,13 @@ class BioSection extends StatelessWidget {
       child: Column(
         children: [
           const _PictureAndNameTag(),
-          30.verticalSpace,
-          SizedBox(
-            width: context.width / 1.5,
-            child: Text(
-              'What is your favorite time of the day?',
-              textAlign: TextAlign.center,
-              style: context.theme.textTheme.titleMedium?.copyWith(height: 1),
-            ),
+          20.verticalSpace,
+          Text(
+            'What is your favorite time of the day?',
+            textAlign: TextAlign.center,
+            style: context.theme.textTheme.titleMedium?.copyWith(height: 1),
           ),
-          30.verticalSpace,
+          15.verticalSpace,
           Center(
             child: Text(
               '"Mine is definitely the peace in the morning."',
@@ -31,7 +28,7 @@ class BioSection extends StatelessWidget {
                   fontStyle: FontStyle.italic),
             ),
           ),
-          20.verticalSpace,
+          30.verticalSpace,
         ],
       ),
     );
@@ -48,12 +45,12 @@ class _PictureAndNameTag extends StatelessWidget {
       alignment: AlignmentDirectional.bottomCenter,
       children: [
         Container(
-          width: 60.w,
-          height: 60.h,
+          width: 40.w,
+          height: 40.h,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             border: Border.all(
-              width: 10,
+              width: 3.5,
               color: const Color(0xFF121517),
             ),
             image: DecorationImage(
@@ -63,9 +60,9 @@ class _PictureAndNameTag extends StatelessWidget {
           ),
         ),
         Positioned(
-          bottom: -10,
+          bottom: -15,
           child: Container(
-            padding: EdgeInsets.symmetric(vertical: 5.h, horizontal: 10.w),
+            padding: EdgeInsets.symmetric(vertical: 2.5.h, horizontal: 5.w),
             decoration: BoxDecoration(
               color: const Color(0xFF121518),
               borderRadius: BorderRadius.circular(50.sp),

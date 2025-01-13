@@ -18,7 +18,7 @@ class AppTheme {
 
   // 🅰️ Font Sizes
   static final double _titleLargeFontSize = 34.sp;
-  static final double _titleMediumFontSize = 20.sp;
+  static final double _titleMediumFontSize = 24.sp;
   static final double _titleSmallFontSize = 11.sp;
   static final double _bodyLargeFontSize = 14.sp;
   static final double _bodyMediumFontSize = 12.sp;

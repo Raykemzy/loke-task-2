@@ -61,7 +61,7 @@ class AudioControls extends ConsumerWidget {
                     'Unmatch',
                     style: context.theme.textTheme.displayMedium?.copyWith(
                       color: audioState == AudioRecorderState.recording
-                          ? context.theme.colorScheme.onError.withOpacity(0.5)
+                          ? context.theme.colorScheme.onError.withOpacity(0.3)
                           : context.theme.colorScheme.error,
                     ),
                   ),
@@ -77,7 +77,7 @@ class AudioControls extends ConsumerWidget {
     return audioState == AudioRecorderState.idle ||
             audioState == AudioRecorderState.recording ||
             audioState == AudioRecorderState.playingStopped
-        ? AppTheme.disabledColor
+        ? AppTheme.disabledColor.withOpacity(0.6)
         : Colors.white;
   }
 }
@@ -92,9 +92,9 @@ class _RecordButton extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Container(
-        width: 70.w,
-        height: 70.h,
-        padding: EdgeInsets.all(5.sp),
+        width: 65.w,
+        height: 65.h,
+        padding: EdgeInsets.all(3.5.sp),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           border: Border.all(

@@ -26,7 +26,7 @@ class _AudioRecorderState extends State<AudioRecorder> {
   //Elapsed time of recording
   late int _elapsedTimeInSeconds;
 
-  //Rate at width waveForm increases in pixels per second
+  //Rate at width waveForm reduces in pixels per second
   final int growthRate = 50;
 
   final double _horizontalPadding = 18.w;
@@ -36,7 +36,7 @@ class _AudioRecorderState extends State<AudioRecorder> {
     super.initState();
     _elapsedTimeInSeconds = widget.recorderController.elapsedDuration.inSeconds;
 
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+    _timer = Timer.periodic(const Duration(milliseconds: 1000), (timer) {
       setState(() {
         // Fetch the current elapsed duration from the recorder controller
         _elapsedTimeInSeconds =
@@ -98,6 +98,7 @@ class _AudioRecorderState extends State<AudioRecorder> {
                               waveCap: StrokeCap.square,
                               waveColor: context.theme.colorScheme.onPrimary,
                               extendWaveform: true,
+                              spacing: 6.0,
                             ),
                           ),
                         )

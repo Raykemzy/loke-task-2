@@ -22,7 +22,9 @@ class HeaderSection extends StatelessWidget {
               AppSvgWidget(path: Assets.svgs.chevronLeft),
               Text(
                 'Angelina, 28',
-                style: context.theme.textTheme.titleMedium,
+                style: context.theme.textTheme.titleMedium?.copyWith(
+                  fontSize: 18.sp,
+                ),
               ),
               AppSvgWidget(path: Assets.svgs.threeDot),
             ],
